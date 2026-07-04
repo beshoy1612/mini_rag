@@ -1,6 +1,9 @@
 from .Base_Controller import Base_controller
+from.Project_Controller import Project_Controller
 from models import ResponseEnum
 from fastapi import FastAPI, APIRouter,Depends,UploadFile
+import re
+import os
 
 class Data_Controller(Base_controller):
     def __init__(self):
@@ -17,4 +20,38 @@ class Data_Controller(Base_controller):
         
         return True,ResponseEnum.FILE_VALIDATE_SUCCESSFULLY.value
     
+
+    def generate_unique_file_name(self,file_name:str, project_id:str):
+
+        random_file_name_key = self.generate_random_string()
+        project_path  = Project_Controller().get_project_path(project_id=project_id)
+        clean_file_name = self.get_clean_file_name(
+            orig_filename=file_name
+        )
+
+        new_file_path = os.path.join(
+            project_path,
+            random_file_name_key + "_"+ clean_file_name
+
+        )
+        
+        while os.path.exists(new_file_path):
+            
+            random_file_name_key = self.generate_random_string()
+            new_file_path = os.path.join(
+                        project_path,
+                        random_file_name_key + "_"+ clean_file_name
+                    )
+            
+        return new_file_path    
+
+    def get_clean_file_name(self ,orig_filename:str):
+
+        #remove any special characters  except .,_
+        clean_file_name = re.sub(r'[^\w.]','',orig_filename.strip())  
+
+        #replace spaces with underscore
+        clean_file_name = clean_file_name .replace(" ","_")
+
+        return clean_file_name 
 
