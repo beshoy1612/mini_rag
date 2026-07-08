@@ -7,6 +7,8 @@ from models import ResponseEnum
 import aiofiles
 from .schemes.data import ProcessRequest
 from models.Project_model import Project_model
+from models.dp_schemes import Data_chunk
+from models.chunk_model import chunk_model
 
 data_router = APIRouter(
     prefix="/api/v1/data",
@@ -71,11 +73,19 @@ async def upload_data(request:Request, project_id:str,file:UploadFile,
 
       
 @data_router.post("/process/{project_id}")
-async def process_endpoint(project_id:str , ProcessRequest:ProcessRequest):
+async def process_endpoint(request:Request,project_id:str , ProcessRequest:ProcessRequest):
 
     file_id = ProcessRequest.file_id
     chunk_size = ProcessRequest.chunk_size
     overlap_size = ProcessRequest.overlap_size
+
+    project_model = Project_model(
+        db_client = request.app.db_client
+    )
+
+    project = await project_model.get_project_or_create_one(
+        project_id = project_id
+    )
 
     process_control = Process_Controller(project_id=project_id)
     file_content  = process_control.get_file_content(file_id=file_id)
@@ -86,6 +96,7 @@ async def process_endpoint(project_id:str , ProcessRequest:ProcessRequest):
         chunk_size=chunk_size,
         overlap_size=overlap_size
         )
+
     
     if file_chunks is None or len(file_chunks)==0:
           return JSONResponse(
@@ -93,5 +104,27 @@ async def process_endpoint(project_id:str , ProcessRequest:ProcessRequest):
                     content={
                     "signal": ResponseEnum.PROCESSING_FAILED
                     }
-                 )
-    return file_chunks
+        )
+
+    file_chunk_record = [
+        Data_chunk(
+            chunk_text = chunk.page_content,
+            chunk_metadata = chunk.metadata,
+            chunk_order = i+1,
+            chunk_project_id = project.id,
+            )
+            for i, chunk in enumerate(file_chunks)
+        ]
+
+    chunkmod =chunk_model(
+        db_client = request.app.db_client
+    )
+
+    no_records = await chunkmod.insert_many_chunks(chunks = file_chunk_record)
+    return JSONResponse(
+        content={
+            "signal": ResponseEnum.PROCESSING_SUCCESS.value,
+            "inserted_chunks":no_records
+        }
+    )
+        

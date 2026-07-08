@@ -8,14 +8,11 @@ class Project_model(BaseDataModel):
         super().__init__(db_client = db_client)
         self.connection = self.db_client[DataBaseEnum.COLLECTION_PROJECT_NAME.value]
 
-
-
     async def create_project(self, project:Project):
-        result = await self.connection.insert_one(project.dict())    
+        result = await self.connection.insert_one(project.dict(by_alias=True,exclude_unset=True))    
         project._id = result.inserted_id
 
         return project
-
 
     async def get_project_or_create_one(self ,project_id :str):
 
@@ -45,5 +42,4 @@ class Project_model(BaseDataModel):
             projects.append(
                  projects(** document)
             )
-
             return projects ,total_pages
