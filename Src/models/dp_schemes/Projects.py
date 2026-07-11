@@ -15,3 +15,18 @@ class Project(BaseModel):
     
     class Config:
         arbitrary_types_allowed = True
+
+    #static method dont need to intailaize object from class to get it using decrotor
+    #we cant use self but use cls because self related to object 
+    @classmethod
+    def get_indexes(cls):
+        return[
+            {
+                "key":[
+                    ("project_id",1)  # 1 to arrange ascending  -1 to arrande descending 
+                ],
+                "name":"project_id_index",
+                "unique":True  # project id must be unique 
+            }
+        ]
+

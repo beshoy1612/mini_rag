@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+# base setting --> to make this class behviour like scheme
 class settings(BaseSettings):
 
     APP_NAME: str 
@@ -10,6 +10,8 @@ class settings(BaseSettings):
     FILE_CHUNK_SIZE:int
     MONGODB_URL :str
     MONGODB_DATABASE:str
+
+    #SettingsConfigDict tells Pydantic where and how to load environment variables
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8"

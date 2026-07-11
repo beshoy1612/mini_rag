@@ -9,6 +9,28 @@ class chunk_model(BaseDataModel):
         super().__init__(db_client = db_client)
         self.connection = self.db_client[DataBaseEnum.COLLECTION_CHUNK_NAME.value]
 
+    # we must call init__connection with constructor to make index just the project_model called
+    # and we cant  call init_collection in __init__ because its async and __init__ cannot to be async
+    # because constructor shouldnt be async and we cant use await in __init__  
+    #so we create function that call __init__ and init_collection function will be static 
+    @classmethod
+    async def create_instance(cls, db_client: object):
+        instance = cls(db_client) # call __init__
+        await instance.init_connection() # call init_collection
+        return instance
+    
+    # async because deal with mongodb and motors 
+    async def init_connection(self):
+        all_collection = await self.db_client.list_collection_names()
+        if DataBaseEnum.COLLECTION_CHUNK_NAME.value not in all_collection:
+            self.connection = self.db_client[DataBaseEnum.COLLECTION_CHUNK_NAME.value]
+            indexes = Data_chunk.get_indexes()
+            for i in indexes:
+                await self.connection.create_index(
+                    i["key"],
+                    name = i["name"],
+                    unique = i["unique"]
+                )
 
     async def create_chunk(self, chunk:Data_chunk):
         result = await self.connection.insert_one(chunk.dict(by_alias=True,exclude_unset=True))

@@ -20,7 +20,7 @@ async def upload_data(request:Request, project_id:str,file:UploadFile,
                       app_settings : settings = Depends(get_settings)):
 
 
-    project_model = Project_model(
+    project_model = await Project_model.create_instance(
         db_client = request.app.db_client
     )
 
@@ -39,6 +39,7 @@ async def upload_data(request:Request, project_id:str,file:UploadFile,
 
     )
     
+    # not used yet
     project_path = Project_Controller().get_project_path(project_id = project_id)
 
     file_path,file_id = Data_Controller().generate_unique_file_path(
@@ -79,7 +80,7 @@ async def process_endpoint(request:Request,project_id:str , ProcessRequest:Proce
     chunk_size = ProcessRequest.chunk_size
     overlap_size = ProcessRequest.overlap_size
 
-    project_model = Project_model(
+    project_model = await Project_model.create_instance(
         db_client = request.app.db_client
     )
 
@@ -116,7 +117,7 @@ async def process_endpoint(request:Request,project_id:str , ProcessRequest:Proce
             for i, chunk in enumerate(file_chunks)
         ]
 
-    chunkmod =chunk_model(
+    chunkmod = await chunk_model.create_instance(
         db_client = request.app.db_client
     )
 
