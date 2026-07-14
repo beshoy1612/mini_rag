@@ -7,8 +7,10 @@ from models import ResponseEnum
 import aiofiles
 from .schemes.data import ProcessRequest
 from models.Project_model import Project_model
-from models.dp_schemes import Data_chunk
+from models.dp_schemes import Data_chunk , Files
 from models.chunk_model import chunk_model
+from models.Files_model import Files_model
+from bson import ObjectId
 
 data_router = APIRouter(
     prefix="/api/v1/data",
@@ -62,11 +64,23 @@ async def upload_data(request:Request, project_id:str,file:UploadFile,
             "signal": ResponseEnum.FILE_UPLOAD_FAILED
             }
          )
-      
+
+    #store Files(assets) into database
+    files_model = await Files_model.create_instance(
+        db_client= request.app.db_client
+    )
+    file_resource = Files(
+        file_project_id = project_id,
+        file_type="file",
+        file_name=file_id,
+        file_size=os.path.getsize(file_path)
+    )
+    file_record = await files_model.create_file(files = file_resource)
+
     return JSONResponse(
         content={
             "signal": ResponseEnum.FILE_UPLOAD_SUCCESS.value,
-            "file_id":file_id,
+            "file_id":str(file_record.id),
             "project_id":str(project_id)
             }  
         )  
