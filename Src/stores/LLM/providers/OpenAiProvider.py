@@ -102,5 +102,5 @@ class OpenAiProvider(LLMInterface):
             "role" : role,
             "content" : self.process_text(prompt) 
         }
-
+ 
     
