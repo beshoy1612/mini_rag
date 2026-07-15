@@ -38,9 +38,22 @@ class Files_model(BaseDataModel):
         return files
 
     
-    async def get_all_project_files(self,files_project_id:str):
-         return await self.connection.find({
-              "file_project_id" :ObjectId(files_project_id) if isinstance(files_project_id,str) 
-              else files_project_id
+    async def get_all_project_files(self,files_project_id:str,file_type:str):
+         records =  await self.connection.find({
+              "file_project_id" :files_project_id,
+              "file_type" :file_type
          }).to_list(length = None) # none to get all things
-   
+
+         return [
+            Files(**record)  
+            for record in records
+        ]
+    async def get_file_record(self, files_project_id:str,file_name:str):
+        records =  await self.connection.find_one({
+            "file_project_id" :files_project_id,
+            "file_name" :file_name
+            })
+        if records :
+             return Files(**records)
+        else:
+             return  None
