@@ -10,6 +10,22 @@ class settings(BaseSettings):
     FILE_CHUNK_SIZE:int
     MONGODB_URL :str
     MONGODB_DATABASE:str
+    
+    GENERATION_BACKEND :str
+    EMBEDDING_BACKEND :str
+
+    #================================OPENAI ,COHERE CONFIG =========================
+    OPENAI_API_KEY :str = None
+    OPENAI_API_URL :str = None
+    COHERE_API_KEY :str = None
+
+    GENERATION_MODEL_ID :str = None
+    EMBEDDING_MODEL_ID :str = None
+    EMBEDDING_MODEL_SIZE :int  = None
+
+    default_input_max_character :int  = None
+    default_output_max_character :int  = None
+    default_generation_temprature :float  = None
 
     #SettingsConfigDict tells Pydantic where and how to load environment variables
     model_config = SettingsConfigDict(
