@@ -12,7 +12,7 @@ async def startup_db_client():
     app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
     LLM_Provider_Factory = LLMProviderFactory(settings)
     #generation client 
-    app.generation_client = LLMProviderFactory.create(provider = settings.GENERATION_BACKEND)
+    app.generation_client = LLM_Provider_Factory.create(provider = settings.GENERATION_BACKEND)
     app.generation_client.set_generation_model(model_id = settings.GENERATION_MODEL_ID)
     #embedding client 
     app.embedding_client = LLMProviderFactory.create(provider = settings.EMBEDDING_BACKEND)
