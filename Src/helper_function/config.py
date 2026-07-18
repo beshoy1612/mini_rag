@@ -26,7 +26,11 @@ class settings(BaseSettings):
     default_input_max_character :int  = None
     default_output_max_character :int  = None
     default_generation_temprature :float  = None
-
+     #================================= vector DB config============================
+    VECTOR_DB_BACKEND :str
+    VECTOR_DB_PATH :str
+    VECTOR_DB_DISTANCE_METHOD :str = None
+    
     #SettingsConfigDict tells Pydantic where and how to load environment variables
     model_config = SettingsConfigDict(
         env_file=".env",

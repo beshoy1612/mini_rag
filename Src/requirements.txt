@@ -10,3 +10,4 @@ motor==3.6.1
 pymongo==4.9.2
 openai==1.35.13
 cohere==4.47.0
+qdrant-client==1.10.1
