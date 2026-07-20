@@ -1,5 +1,5 @@
 from ..LLMInterface import LLMInterface
-from LLMenum import CoHereEnum,DocumentTypeEnum
+from ..LLMenum import CoHereEnum,DocumentTypeEnum
 import cohere
 import logging
 
@@ -95,7 +95,7 @@ class CoHereProvider(LLMInterface):
             embedding_types = ['float']
         )
 
-        if not response or not response.embeddings or response.embeddings.float:
+        if not response or not response.embeddings or not response.embeddings.float:
             self.logger.error("Error while embedding text with Cohere")
             return None
         

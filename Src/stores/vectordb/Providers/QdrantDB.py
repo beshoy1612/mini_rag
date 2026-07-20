@@ -40,7 +40,7 @@ class QdrantDB(VectorDBInterface):
             return self.client.delete_collection(collection_name=collection_name)
 
 
-    def create_collectiom(self,collection_name: str,
+    def create_collection(self,collection_name: str,
                               embedding_size: int,
                               do_reset: bool = False) :
         if do_reset:

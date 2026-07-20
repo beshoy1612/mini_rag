@@ -5,6 +5,7 @@ class VectorDBProviderFactory:
     def __init__(self,config):
         self.config = config
         self.base_controller = Base_controller()
+        
     def create(self,provider:str):
          if provider == VectorDBEnum.QDRANT.value:
              db_path = self.base_controller.get_database_path(db_name=self.config.VECTOR_DB_PATH)
