@@ -2,6 +2,9 @@ from .Base_Controller import Base_controller
 from models.dp_schemes import Project,Data_chunk
 from typing import List
 from stores.LLM.LLMenum import DocumentTypeEnum 
+import json
+
+
 class nlp_controller(Base_controller):
     def __init__(self,vectordb_client,embedding_client,generation_client):
         super().__init__()
@@ -20,7 +23,9 @@ class nlp_controller(Base_controller):
     def get_vetor_db_collection_info(self,project:Project) :
         collection_name = self.create_collection_name(project_id = project.id)
         collection_info = self.vectordb_client.get_collection_info(collection_name = collection_name)
-        return collection_info
+        return json.loads(
+            json.dumps(collection_info,default=lambda x:x.__dict__)
+        )
 
 
     def index_into_vector_db(self,project:Project,chunk:List[Data_chunk],
@@ -53,3 +58,25 @@ class nlp_controller(Base_controller):
             )
         return True
 
+    def search_vector_db_collection (self,project:Project ,text :str ,limit:int = 10):
+        # 1 - get collection name
+        collection_name = self.create_collection_name(project_id = project.id)
+
+        # 2 - get text embedding vector
+        vector  = self.embedding_client.embed_text(text = text,document_type = DocumentTypeEnum.QUERY.value)
+        if not vector or len(vector) == 0:
+            return False
+        
+        # 3 - do semantic search
+
+        result = self.vectordb_client.search_by_vector(
+            collection_name = collection_name,
+            vector = vector,
+              limit = limit
+              )
+        if not result :
+            return False
+        
+        return json.loads(
+            json.dumps(result,default=lambda x:x.__dict__)
+            )

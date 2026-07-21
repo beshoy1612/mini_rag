@@ -127,7 +127,7 @@ class QdrantDB(VectorDBInterface):
                 return False
             
         return True
-
+ 
 
     def search_by_vector(self,collection_name: str,vector:list, limit: int):
         return self.client.search(
