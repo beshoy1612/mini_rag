@@ -3,8 +3,7 @@ from routes import base,data,nlp
 from motor.motor_asyncio import AsyncIOMotorClient
 from helper_function.config import get_settings
 from stores.LLM.LLMProviderFactory import LLMProviderFactory
-from stores.vectordb import VectorDBProviderFactory
-
+from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 app = FastAPI()
 @app.on_event("startup")
 async def startup_db_client():
@@ -18,7 +17,7 @@ async def startup_db_client():
     app.generation_client = LLM_Provider_Factory.create(provider = settings.GENERATION_BACKEND)
     app.generation_client.set_generation_model(model_id = settings.GENERATION_MODEL_ID)
     #embedding client 
-    app.embedding_client = LLMProviderFactory.create(provider = settings.EMBEDDING_BACKEND)
+    app.embedding_client = LLM_Provider_Factory.create(provider = settings.EMBEDDING_BACKEND)
     app.embedding_client.set_embedding_model(model_id = settings.EMBEDDING_MODEL_ID,
                                             embedding_size = settings.EMBEDDING_MODEL_SIZE)
     #vector db client

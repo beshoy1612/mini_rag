@@ -1,5 +1,5 @@
 from ..LLMInterface import LLMInterface
-from LLMenum import OpenAiEnum
+from ..LLMenum import OpenAiEnum
 from openai import OpenAI
 import logging
 

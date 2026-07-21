@@ -58,3 +58,13 @@ class chunk_model(BaseDataModel):
             await self.connection.bulk_write(operation)
 
         return len(chunks)       
+
+    async def get_project_chunk(self,project_id:ObjectId,page_no: int = 1,page_size: int = 100):
+        result = await self.connection.find({
+            "chunk_project_id": project_id
+        }).skip((page_no - 1)*page_size).limit(page_size).to_list(length = None)
+
+        return[
+            Data_chunk(**rec)
+            for rec in result
+        ]

@@ -1,5 +1,5 @@
 from .LLMenum import LLMenum
-from .providers import OpenAiProvider,CoHerenceProvider
+from .providers import OpenAiProvider,CoHereProvider
 class LLMProviderFactory():
     def __init__(self,config: dict):
         self.config = config
@@ -15,7 +15,7 @@ class LLMProviderFactory():
             )
         
         if provider == LLMenum.COHERE.value:    
-            return OpenAiProvider(
+            return CoHereProvider(
                 api_key = self.config.COHERE_API_KEY,
                 default_input_max_character  = self.config.default_input_max_character,
                 default_output_max_character =  self.config.default_output_max_character,

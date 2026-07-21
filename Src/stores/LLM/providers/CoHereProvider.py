@@ -73,32 +73,32 @@ class CoHereProvider(LLMInterface):
 
 
     # in cohere document type is important because model must know what is the type of input text
-    def embed_text(self,text: str,document_type: str= None): 
+    def embed_text(self, text: str, document_type: str = None):
 
         if not self.client:
             self.logger.error("Cohere client was not found")
             return None
-        
+
         if not self.embedding_model_id:
-            self.logger.error("embedding model for Cohere was not found")
+            self.logger.error("Embedding model for Cohere was not found")
             return None
 
-        input_type = CoHereEnum.DOCUMENT
-        
-        if document_type == DocumentTypeEnum.QUERY:
-            input_type = CoHereEnum.QUERY
+        input_type = "search_document"
 
-        response = self.client.embeddings.create(
-            model = self.embedding_model_id,
-            text = [self.process_text(text)],
-            input_type = input_type,
-            embedding_types = ['float']
+        if document_type == DocumentTypeEnum.QUERY.value:
+            input_type = "search_query"
+
+        response = self.client.embed(
+            texts=[self.process_text(text)],
+            model=self.embedding_model_id,
+            input_type=input_type,
+            embedding_types=["float"],
         )
 
-        if not response or not response.embeddings or not response.embeddings.float:
+        if not response or not response.embeddings:
             self.logger.error("Error while embedding text with Cohere")
             return None
-        
+
         return response.embeddings.float[0]
 
 

@@ -2,4 +2,4 @@ from typing import Optional
 from pydantic import BaseModel
 
 class Push_Request(BaseModel):
-    do_restc:Optional[int] = 0
+    do_reset:Optional[int] = 0

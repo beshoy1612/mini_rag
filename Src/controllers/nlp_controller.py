@@ -14,19 +14,20 @@ class nlp_controller(Base_controller):
         return f"collection_{project_id}".strip()
 
     def reset_vector_db_collection(self,project:Project):
-        collection_name = self.create_collection_name(project_id = Project.project_id)
+        collection_name = self.create_collection_name(project_id = project.id)
         return self.vectordb_client.delete_collection(collection_name = collection_name)
 
     def get_vetor_db_collection_info(self,project:Project) :
-        collection_name = self.create_collection_name(project_id = Project.project_id)
+        collection_name = self.create_collection_name(project_id = project.id)
         collection_info = self.vectordb_client.get_collection_info(collection_name = collection_name)
         return collection_info
 
 
     def index_into_vector_db(self,project:Project,chunk:List[Data_chunk],
+                             chunk_ids:List[int],
                              do_reset:bool = False):
         #step 1: get collection name
-        collection_name = self.create_collection_name(project_id = Project.project_id)
+        collection_name = self.create_collection_name(project_id = project.id)
 
         #step 2: manage items
         text = [c.chunk_text for c in chunk]
@@ -47,6 +48,8 @@ class nlp_controller(Base_controller):
             collection_name = collection_name ,
             text = text ,
             vector = vectors,
-            metadata = meta_data
+            metadata = meta_data,
+            record_id = chunk_ids,
             )
         return True
+
