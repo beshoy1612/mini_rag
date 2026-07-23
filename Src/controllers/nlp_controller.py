@@ -6,12 +6,13 @@ import json
 
 
 class nlp_controller(Base_controller):
-    def __init__(self,vectordb_client,embedding_client,generation_client):
+    def __init__(self,vectordb_client,embedding_client,generation_client,template_parser):
         super().__init__()
 
         self.generation_client = generation_client
         self.vectordb_client = vectordb_client
         self.embedding_client = embedding_client
+        self.template_parser = template_parser
 
     def create_collection_name(self , project_id:str):
         return f"collection_{project_id}".strip()
@@ -77,6 +78,53 @@ class nlp_controller(Base_controller):
         if not result :
             return False
         
-        return json.loads(
-            json.dumps(result,default=lambda x:x.__dict__)
+        return result
+
+
+    def answer_rag_question(self, project:Project,query:str,limit: int = 10):
+        answer, full_prompt, chat_history = None, None, None
+        #step 1 : retrive document from vectordb collection
+        retrived_document = self.search_vector_db_collection(
+            project=project,
+            text=query,
+            limit=limit
+        )
+        if not retrived_document or len(retrived_document)==0:
+            return answer, full_prompt, chat_history
+
+        #step 2: LLM prompt ==>(system prompt , user prompt(document,footer)prompt)
+        system_prompt = self.template_parser.get("rag","system_prompt") # will be stored in chat history(generation model)
+        # using comprehension list 
+        document_prompt ="\n".join ([
+            self.template_parser.get("rag","document_prompt",
+                {
+                    "doc_num":idx+1,
+                    "chunk_text":doc.text,
+                })
+            for idx,doc in enumerate( retrived_document)
+        ])
+
+        footer_prompt = self.template_parser.get(
+            "rag",
+            "footer_prompt",
+            {
+                "query": query
+            }
+        )
+         # step3: Construct Generation Client Prompts
+        chat_history = [
+            self.generation_client.construct_prompt(
+                prompt=system_prompt,
+                role=self.generation_client.enums.SYSTEM.value,
             )
+        ]
+
+        full_prompt = "\n\n".join([ document_prompt,  footer_prompt])
+
+        # step4: Retrieve the Answer
+        answer = self.generation_client.generate_text(
+            prompt=full_prompt,
+            chat_history=chat_history
+        )
+
+        return answer, full_prompt, chat_history

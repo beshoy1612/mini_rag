@@ -1,5 +1,6 @@
 from abc import ABC,abstractmethod
 from typing import List
+from models.dp_schemes import Retrived_document
 # if we implement interface for vector db we should 
 # implement two important function 1-connect , 2-disconnet(optinal)
 #collection not table (no SQL)
@@ -48,6 +49,6 @@ class VectorDBInterface(ABC):
  # we need it in sementic search when model get question from user and embedding it to
  #  vector then seach by vector in database for (answer + llm)
     @abstractmethod
-    def search_by_vector(self,collection_name: str,vector:list, limit: int):
+    def search_by_vector(self,collection_name: str,vector:list, limit: int) -> List[Retrived_document]:
         pass    
     

@@ -27,4 +27,7 @@ class Data_chunk(BaseModel):
                 "unique":False  # chunk_project id can be repeated
             }
         ]
-        
+
+class Retrived_document(BaseModel):
+    text : str
+    score : float

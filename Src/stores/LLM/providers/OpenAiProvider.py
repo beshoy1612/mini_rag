@@ -30,7 +30,7 @@ class OpenAiProvider(LLMInterface):
             api_key=self.api_key,
             base_url=self.api_url
         )
-
+        self.enums = OpenAiEnum
         self.logger = logging.getLogger(__name__)
 
     def set_generation_model(self,model_id: str):
@@ -43,7 +43,7 @@ class OpenAiProvider(LLMInterface):
 
 
 
-    def generate_text(self,prompt: str,max_output_tokens: int,
+    def generate_text(self,prompt: str,max_output_tokens: int = None,
                       chat_history: list = [],temperature: float = None):
         
         if not self.client:
@@ -59,17 +59,17 @@ class OpenAiProvider(LLMInterface):
         chat_history.append (
             self.construct_prompt(prompt=prompt,role=OpenAiEnum.USER.value)
         )
-        response = self.client.embeddings.create(
-            model = self.generation_model_id,
-            messages = chat_history,
-            max_tokens = max_output_tokens,
-            temperature = temperature
+        response = self.client.chat.completions.create(
+            model=self.generation_model_id,
+            messages=chat_history,
+            max_tokens=max_output_tokens,
+            temperature=temperature,
         )
 
         if not response or not response.choices or not len(response.choices) or not response.choices[0].message:
             self.logger.error("Error while generating text with OpenAi")
             return None
-        return response.choices[0].message["content"]
+        return response.choices[0].message.content
 
 
         

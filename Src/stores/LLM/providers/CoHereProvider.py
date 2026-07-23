@@ -24,7 +24,7 @@ class CoHereProvider(LLMInterface):
 
         # intilaize client to deal with COHERE ai 
         self.client = cohere.Client(api_key = self.api_key)
-
+        self.enums = CoHereEnum
         self.logger = logging.getLogger(__name__)
 
 
@@ -44,7 +44,7 @@ class CoHereProvider(LLMInterface):
 
 
 
-    def generate_text(self,prompt: str,max_output_tokens: int,
+    def generate_text(self,prompt: str,max_output_tokens: int = None,
                           chat_history: list = [],temperature: float = None):
 
         if not self.client:
